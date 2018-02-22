@@ -1,0 +1,7 @@
+"wasteland"
+{
+	"base"		"base"
+	"title"		"Wasteland"
+	"maps"		"^wl_"
+
+}
