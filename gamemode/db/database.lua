@@ -1,5 +1,9 @@
+include("items.lua")
+
 local ply = FindMetaTable( "Player" )
 util.AddNetworkString("database")
+util.AddNetworkString("inv_drop")
+util.AddNetworkString("inv_use")
 
 function ply:ShortSteamID()
 
@@ -18,6 +22,7 @@ function ply:databaseDefault()
 	
 	local i = {}
 	i["soda1"] = { amount = 10 }
+	i["glock"] = { amount = 1 }
 	
 	self:databaseSetValue("inventory", i)
 end
@@ -38,7 +43,7 @@ end
 
 function ply:databaseFolders()
 
-	return "server/example/players/" .. self:ShortSteamID() .. "/"
+	return "server/wasteland/players/" .. self:ShortSteamID() .. "/"
 
 end
 
@@ -155,3 +160,183 @@ end
 function GM:ShowSpare2( ply )
 	ply:ConCommand( "wl_inv" )
 end
+
+function ply:inventorySave( i )
+	
+	self:databaseSetValue( "inventory", i )
+	
+	
+end
+
+function ply:inventoryGet()
+
+	local i = self:databaseGetValue("inventory")
+	return i
+end
+
+function ply:inventoryHasItem( name, amount )
+
+	if not amount then amount = 1 end
+	
+	local i = self:inventoryGet()
+	
+	if i then
+		if i[name] then
+			if i[name].amount >= amount then
+				return true
+			else
+				return false
+			end
+		else
+			return false
+		end
+	else
+		return false
+	end
+end
+
+
+function ply:inventoryTakeItem( name, amount )
+
+	if not amount then amount = 1 end
+	
+	local i = self:inventoryGet()
+	
+	if self:inventoryHasItem( name, amount ) then
+	
+		i[name].amount = i[name].amount - amount
+		
+		self:databaseSend()
+		self:inventorySave(i)
+	
+		return true
+	else
+		return false
+	end
+end
+
+function ply:inventoryGiveItem( name, amount )
+
+	if not amount then amount = 1 end
+	
+	local i = self:inventoryGet()
+	
+	local item = getItems(name)
+	
+	if not item then return end
+	
+	
+	if amount == 1 then
+		self:PrintMessage(HUD_PRINTTALK, "You picked up a " .. item.name .. ".")
+	elseif amount > 1 then
+		self:PrintMessage(HUD_PRINTTALK, "You recieved " .. amount .. " " .. item.name .. "s.")
+	end
+
+	if self:inventoryHasItem( name, amount ) then
+		i[name].amount = i[name].amount + amount
+	else
+		i[name] = {amount = amount}
+	end
+	
+	self:databaseSend()
+	self:inventorySave()
+
+end
+
+net.Receive("inv_drop", function(len, ply)
+
+	local name = net.ReadString()
+	
+	if ply:inventoryHasItem( name, 1 ) then
+		ply:inventoryTakeItem( name, 1 )
+		makeItem( ply, name, itemSpawnPos( ply ) )
+	end
+
+end)
+
+net.Receive("inv_use", function(len, ply)
+
+	local name = net.ReadString()
+	
+	local item = getItems( name )
+	
+	if item then
+		if ply:inventoryHasItem( name, 1 ) then
+			ply:inventoryTakeItem( name, 1 )
+			item.use( ply )
+		end
+	end
+end)
+
+local idd = 0
+
+function makeItem( ply, name, pos )
+
+	local itemT = getItems( name )
+	
+	if itemT then
+		idd = idd + 1
+	
+		local item = ents.Create( itemT.ent )
+		
+		item:SetNWString("name", itemT.name)
+		item:SetNWString("itemName", name)
+		item:SetNWInt("uID", idd)
+		item:SetNWBool("pickup", true)
+		item:SetPos( pos )
+		item:SetNWEntity("owner", ply )
+		item:SetSkin(itemT.skin or 0)
+		itemT.spawn(ply, item)
+		item:Spawn()
+		item:Activate()
+	else
+		return false
+	end
+
+end
+
+function itemSpawnPos( ply )
+
+	local pos = ply:GetShootPos()
+	local ang = ply:GetAimVector()
+	
+	local td = {}
+	
+	td.start = pos
+	td.endpos = pos + (ang*80)
+	td.filter = ply
+	local trace = util.TraceLine(td)
+	return trace.HitPos
+
+end
+
+function inventoryPickup( ply )
+
+	local trace = {}
+	trace.start = ply:EyePos()
+	trace.endpos = trace.start + ply:GetAimVector() * 85
+	trace.filter = ply
+	
+	local tr = util.TraceLine(trace)
+	
+	if (tr.HitWorld) then return end
+	
+	if !tr.Entity:IsValid() then return end
+	
+	if tr.Entity:GetNWBool("pickup") then
+	
+		local item = getItems( tr.Entity:GetNWString("itemName"))
+			if tr.Entity:GetNWBool("pickup") == nil then
+				ply:inventoryGiveItem( tr.Entity:GetNWString("itemName"), 1)
+				tr.Entity:Remove()
+			else
+				if tr.Entity:GetNWBool("pickup") then
+					ply:inventoryGiveItem( tr.Entity:GetNWString("itemName"), 1)
+					tr.Entity:Remove()
+				end
+			end
+	end
+end
+hook.Add("KEY_E", "inventoryPickup", inventoryPickup)
+
+		

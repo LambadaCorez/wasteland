@@ -1,25 +1,3 @@
-
-local ply = FindMetaTable("Player")
-
-surface.CreateFont( "invHighlight", {
-	font = "Roboto Heavy", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
-	extended = false,
-	size = 18,
-	weight = 500,
-	blursize = 0,
-	scanlines = 2,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = true,
-} )
-
-
 local database = {}
 
 local function databaseReceive( tab )
@@ -69,58 +47,7 @@ function inventoryHasItem( name, amount )
 	
 	end
 	
-	local hzCross = false
 	
-	local stringName;
-	
-function invGlow()
-
-	local trace = {}
-	trace.start = LocalPlayer():EyePos()
-	trace.endpos = trace.start + LocalPlayer():GetAimVector() * 85
-	trace.filter = LocalPlayer()
-	
-	local tr = util.TraceLine(trace)
-	
-	local trace = {}
-	trace.start = LocalPlayer():EyePos()
-	trace.endpos = trace.start + LocalPlayer():GetAimVector() * 85
-	trace.filter = LocalPlayer()
-	
-	local tr = util.TraceLine(trace)
-	
-	if (tr.HitWorld) then hzCross = false return end
-	
-	if !tr.Entity:IsValid() then hzCross = false return end
-	
-	
-	if tr.Entity:GetNWBool("pickup") then
-	hzCross = true
-	stringName = tr.Entity
-	--Entity glow effect
-	 halo.Add({tr.Entity}, Color( 255, 255, 255 ))
-		
-	 else
-	 hzCross = false
-	 end
-end
-
-function highlightCrosshair()
-	if hzCross then
-	surface.DrawCircle(ScrW() / 2, ScrH() / 2, 2, Color(255,255,255))
-	surface.DrawCircle(ScrW() / 2, ScrH() / 2, 1, Color(255,255,255))
-	draw.RoundedBox( 4, ScrW() / 2 + 15, ScrH() / 2 - 16, 32, 32, Color(35,35, 35))
-	surface.SetFont( "invHighlight" )
-		draw.DrawText("E","invHighlight", ScrW()/2 + 27.5, ScrH()/2 - 9)
-		surface.SetTextPos( ScrW() / 2 + 55, ScrH() / 2 - 10 )
-		surface.DrawText(tostring(stringName:GetNWString("name")))	
-		
-		end
-	end
-
-hook.Add("HUDPaint","CustomCross",highlightCrosshair)
-hook.Add("Think", "itemGlow", invGlow)
-
 local SKINS = {}
 SKINS.COLORS = {
 	lightgrey = Color(131,131,131,180),
@@ -269,6 +196,7 @@ function inventoryMenu()
 				f:Close()
 			end)
 			buttons["Drop"] = (function()
+				print("k name: " .. k)
 				inventoryDrop(k)
 				f:Close()
 			end)
