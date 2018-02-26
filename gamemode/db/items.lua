@@ -4,9 +4,36 @@ function getItems( name )
 	if items[name] then
 		return items[name]
 	end
-	return "none"
+	return false
 end
  
+ 
+items["fillervalue"] = {
+
+	name = "fillervalue",
+	desc = "Hey... How'd you get this item?!",
+	ent = "item_basic",
+	prices = {
+		buy = 0,
+		sell = 0, 
+	},
+	model = "models/props_junk/PopCan01a.mdl",
+	
+	use = (function(ply, ent)
+		if ply:IsValid() then
+			ply:SetHealth( math.Clamp(ply:Health() + 2, 0, 100 ))
+			if ent then
+				ent:Remove()
+		end
+		end
+		end),
+		spawn = (function(ply, ent)
+			ent:SetItemName("soda")
+			end),
+			skin = 0,
+			buttonDist = 32,
+
+}
 items["soda1"] = {
 	
 	name = "Blueberry Soda",
@@ -48,7 +75,7 @@ items["soda2"] = {
 	
 	use = (function(ply, ent)
 		if ply:IsValid() then
-			ply:AddHealth( 2 )
+			ply:SetHealth( math.Clamp(ply:Health() + 2, 0, 100 ))
 			if ent then
 				ent:Remove()
 		end
@@ -64,7 +91,7 @@ items["soda2"] = {
 }
 items["soda3"] = {
 	
-	name = "ORANGE Soda",
+	name = "O R A N G E Soda",
 	desc = "SICK ASS FUCKIN TOTALLY TUBULAR SODA",
 	ent = "item_basic",
 	prices = {
@@ -75,7 +102,7 @@ items["soda3"] = {
 	
 	use = (function(ply, ent)
 		if ply:IsValid() then
-			ply:AddHealth( 2 )
+			ply:SetHealth( math.Clamp(ply:Health() + 2, 0, 100 ))
 			if ent then
 				ent:Remove()
 		end
@@ -89,6 +116,60 @@ items["soda3"] = {
 		
 
 }
+
+items["melon"] = {
+
+	name = "Melon",
+	desc = "Ultra juicy melon!",
+	ent = "item_basic",
+	prices = {
+		buy = 10,
+		sell = 6,
+	},
+	model = "models/props_junk/watermelon01.mdl",
+	
+	use = (function(ply, ent)
+		if ply:IsValid() then
+			ply:SetHealth( math.Clamp(ply:Health() + 15, 0, 100 ))
+			if ent then
+				ent:Remove()
+		end
+		end
+		end),
+		spawn = (function(ply, ent)
+			ent:SetItemName("melon")
+			end),
+			skin = 0,
+			buttonDist = 48,
+
+}
+
+items["flashlight"] = {
+
+	name = "Flashlight",
+	desc = "Allows you to see in the dark.",
+	ent = "item_basic",
+	prices = {
+		buy = 75,
+		sell = 45,
+	},
+	model = "models/maxofs2d/lamp_flashlight.mdl",
+	equippable = true,
+	use = (function(ply, ent)
+		if ply:IsValid() then
+			ply:AllowFlashlight(true)
+			if ent then
+				ent:Remove()
+		end
+		end
+		end),
+		spawn = (function(ply, ent)
+			ent:SetItemName("flashlight")
+			end),
+			skin = 0,
+			buttonDist = 48,
+
+}
 items["glock"] = {
 	
 	name = "Glock-20",
@@ -99,7 +180,7 @@ items["glock"] = {
 		sell = 750,
 	},
 	model = "models/weapons/w_glock20.mdl",
-	
+	equippable = true,
 	use = (function(ply, ent)
 		if ply:IsValid() then
 			ply:Give("fas2_glock20")

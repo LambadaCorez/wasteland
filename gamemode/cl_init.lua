@@ -16,7 +16,7 @@ hook.Add("Think","e_press", keyE)
 
 --HUD DISABLE
 local tohide = { -- This is a table where the keys are the HUD items to hide
-	["CHudHealth"] = false,
+	["CHudHealth"] = true,
 	["CHudAmmo"] = true,
 	["CHudSecondaryAmmo"] = true,
 	["CHudCrosshair"] = true
@@ -27,3 +27,9 @@ local function HUDShouldDraw(name)
 	end
 end
 hook.Add("HUDShouldDraw", "hider", HUDShouldDraw)
+
+function GM:RenderScreenspaceEffects()
+
+ DrawToyTown( 2, ScrH()/2 )
+
+end

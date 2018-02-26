@@ -9,8 +9,19 @@ include("db/items.lua")
 
 util.AddNetworkString("KEY_E")
 
-	function GM:PlayerInitialSpawn()
-		
+local models = {}
+
+models[0] = "models/player/Group03/male_01.mdl"
+models[1] = "models/player/Group03/male_02.mdl"
+models[2] = "models/player/Group03/male_04.mdl"
+models[3] = "models/player/Group03/male_05.mdl"
+models[4] = "models/player/Group03/male_07.mdl"
+models[5] = "models/player/Group03/male_09.mdl"
+models[6] = "models/player/Group03/male_08.mdl"
+
+	function GM:PlayerInitialSpawn(ply)
+		ply:SetModel(table.Random(models))
+		ply:ConCommand("wl_hb")
 	end
 
 	function GM:PlayerSpawn( ply )
@@ -27,7 +38,10 @@ util.AddNetworkString("KEY_E")
 	
 	function GM:PlayerDisconnected( ply )
 	
+	ply:inventoryDisconnect()
+	ply:hotbarDisconnect()
 	ply:databaseDisconnect()
+	
 	
 	end
 	

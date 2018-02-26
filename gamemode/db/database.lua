@@ -4,6 +4,8 @@ local ply = FindMetaTable( "Player" )
 util.AddNetworkString("database")
 util.AddNetworkString("inv_drop")
 util.AddNetworkString("inv_use")
+util.AddNetworkString("inv_equip")
+util.AddNetworkString("inv_dequip")
 
 function ply:ShortSteamID()
 
@@ -19,13 +21,18 @@ function ply:databaseDefault()
 	self:databaseSetValue( "money", 0 )
 	self:databaseSetValue( "hunger", 100 )
 	self:databaseSetValue( "thirst", 100 )
+	self:databaseSetValue( "hotbar", {["fillervalue"] = {amount = 1}} )
+	
 	
 	local i = {}
+	i["fillervalue"] = { amount = 1 }
 	i["soda1"] = { amount = 10 }
 	i["glock"] = { amount = 1 }
-	
+	i["flashlight"] = { amount = 1 }
+	i["melon"] = { amount = 1 }
 	self:databaseSetValue("inventory", i)
 end
+
 
 function ply:databaseNetworkedData()
 
@@ -128,7 +135,7 @@ function ply:databaseSetValue( name, v )
 	if not v then return end
 	
 	if type(v) == "table" then
-		if name == "inventory" then
+		if name == "inventory" or "hotbar" then
 			for k,b in pairs(v) do
 				if b.amount <= 0 then
 					v[k] = nil
@@ -157,6 +164,18 @@ function ply:databaseDisconnect()
 
 end
 
+function ply:inventoryDisconnect()
+
+	self:inventorySave()
+
+end
+
+function ply:hotbarDisconnect()
+
+	self:inventoryHotbarSave()
+
+end
+
 function GM:ShowSpare2( ply )
 	ply:ConCommand( "wl_inv" )
 end
@@ -168,10 +187,24 @@ function ply:inventorySave( i )
 	
 end
 
+function ply:inventoryHotbarSave( i )
+	
+	self:databaseSetValue( "hotbar", i )
+	
+	
+end
+
 function ply:inventoryGet()
 
 	local i = self:databaseGetValue("inventory")
 	return i
+end
+
+function ply:inventoryHotbarGet()
+
+	local i = self:databaseGetValue("hotbar")
+	return i
+	
 end
 
 function ply:inventoryHasItem( name, amount )
@@ -195,6 +228,47 @@ function ply:inventoryHasItem( name, amount )
 	end
 end
 
+function ply:inventoryHotbarHasItem( name )
+
+	amount = 1 
+	
+	local i = self:inventoryHotbarGet()
+	
+	if i then
+		if i[name] then
+			if i[name].amount >= amount then
+				return true
+			else
+				return false
+			end
+		else
+			return false
+		end
+	else
+		return false
+	end
+end
+
+function ply:inventoryEquipHasSpace( name )
+
+	amount = 1
+	
+	local i = self:inventoryBarGet()
+	
+	if i then
+		if i[name] then
+			if i[name].amount >= amount then
+				return true
+			else
+				return false
+			end
+		else
+			return false
+		end
+	else
+		return false
+	end
+end
 
 function ply:inventoryTakeItem( name, amount )
 
@@ -202,17 +276,30 @@ function ply:inventoryTakeItem( name, amount )
 	
 	local i = self:inventoryGet()
 	
+	local k = self:inventoryHotbarGet()
+	
 	if self:inventoryHasItem( name, amount ) then
 	
 		i[name].amount = i[name].amount - amount
 		
 		self:databaseSend()
 		self:inventorySave(i)
-	
+		self:inventoryHotbarSave(k)
+		
 		return true
 	else
 		return false
 	end
+end
+
+function ply:hotbarHasSpace()
+
+	if table.Count(self:databaseGet("hotbar")) != 4 or !IsValid(self:databaseGet("hotbar")) then
+		return true
+	else
+		return false
+	end
+
 end
 
 function ply:inventoryGiveItem( name, amount )
@@ -220,6 +307,7 @@ function ply:inventoryGiveItem( name, amount )
 	if not amount then amount = 1 end
 	
 	local i = self:inventoryGet()
+	local k = self:inventoryHotbarGet()
 	
 	local item = getItems(name)
 	
@@ -239,7 +327,65 @@ function ply:inventoryGiveItem( name, amount )
 	end
 	
 	self:databaseSend()
-	self:inventorySave()
+	self:inventorySave(i)
+	self:inventoryHotbarSave(k)
+
+end
+
+function ply:inventoryHotbarGiveItem( name )
+
+	amount = 1
+	
+	local i = self:inventoryHotbarGet()
+	
+	local k = self:inventoryGet()
+	
+	local item = getItems(name)
+	
+	if not item then return end
+	
+	
+	if amount == 1 then
+		self:PrintMessage(HUD_PRINTTALK, "You put the " .. item.name .. " into your hotbar.")
+	end
+
+	if self:inventoryHotbarHasItem( name, amount ) then
+		i[name].amount = i[name].amount + amount
+	else
+		i[name] = {amount = amount}
+	end
+	
+	self:databaseSend()
+	self:inventorySave(k)
+	self:inventoryHotbarSave(i)
+
+end
+
+function ply:inventoryHotbarTakeItem( name )
+
+	amount = 1
+	
+	local i = self:inventoryHotbarGet()
+	
+	local k = self:inventoryGet()
+	
+	local item = getItems(name)
+	
+	if not item then return end
+	
+	
+		i[name].amount = i[name].amount - amount
+	
+		for k, v in pairs(i) do
+			if v.amount <= 0 then
+				i[k] = nil
+			end
+		end
+		
+		self:databaseSend()
+		self:inventorySave(k)
+		self:inventoryHotbarSave(i)
+
 
 end
 
@@ -262,11 +408,53 @@ net.Receive("inv_use", function(len, ply)
 	
 	if item then
 		if ply:inventoryHasItem( name, 1 ) then
+			
 			ply:inventoryTakeItem( name, 1 )
 			item.use( ply )
 		end
 	end
 end)
+
+net.Receive("inv_equip", function(len, ply)
+
+	local name = net.ReadString()
+	
+	local item = getItems( name )
+	
+	if item then
+	
+		if ply:inventoryHasItem( name, 1 ) then
+			print("has sucessfully equipped item")
+			ply:inventoryTakeItem( name, 1 )
+			ply:equipItem( name )
+		end
+	end
+end)
+
+net.Receive("inv_dequip", function(len, ply)
+
+	local name = net.ReadString()
+	
+	local item = getItems( name )
+	
+	if item then
+			ply:inventoryGiveItem( name, 1 )
+			ply:inventoryHotbarTakeItem( name )
+		end
+end)
+
+function ply:equipItem( item )
+
+	if self:hotbarHasSpace() then
+	
+		print("item equip")
+		self:inventoryHotbarGiveItem( item )
+	
+	else
+		return false
+	end
+
+end
 
 local idd = 0
 
