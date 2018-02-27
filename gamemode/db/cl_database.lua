@@ -293,6 +293,12 @@ local function inventoryDequip(item)
 	net.SendToServer()
 end
 
+local function inventoryAttach(item)
+	net.Start("inv_attach")
+	net.WriteString(tostring(item))
+	net.SendToServer()
+end
+
 local function inventoryDrop(item)
 	net.Start("inv_drop")
 	net.WriteString(tostring(item))
@@ -317,6 +323,7 @@ function inventoryMenu()
 	r:SetDraggable(false)
 	r:ShowCloseButton(true)
 	r:MakePopup()
+	
 	
 	r.Paint = function()
 	
@@ -355,7 +362,13 @@ function inventoryMenu()
 				refreshPanels()
 				end)
 			end
-			if !i.equippable then
+			if i.attachment then
+			buttons["Put Into Attachment Stash"] = (function()
+				inventoryAttach(k)
+				refreshPanels()
+				end)
+			end
+			if !i.equippable and !i.attachment then
 			buttons["Use"] = (function()
 				inventoryUse(k)
 				r:Close()
@@ -365,8 +378,10 @@ function inventoryMenu()
 				inventoryDrop(k)
 				r:Close()
 			end)
+		if( i.name != "fillervalue" ) then
 		local b = inventoryItemButton( k, i.name .. " (" .. v.amount .. ")", v.amount, i.desc, i.model, items, i.buttonDist, buttons )
 		items:AddItem(b)
+		end
 		end
 	end
 	
@@ -393,10 +408,10 @@ function hotbarMenu()
 	f:SetDraggable(false)
 	f:ShowCloseButton(false)
 	f:SetTitle( "" )
-	f:Refresh()
 	f.Paint = function()
 		draw.RoundedBox( 4, 0, 0, w, h, Color( 100, 100, 100 ) )
 	end
+	
 	
 	
 	local padding = 4
@@ -420,8 +435,8 @@ function hotbarMenu()
 	local function specButtons()
 		for k,v in pairs(hotbar) do
 		local i = getItems(k)
-		print(k)
 		if i then
+			
 			local buttons = {}
 			if i.equippable then
 			buttons["De-Equip"] = (function()
@@ -455,13 +470,13 @@ end
 
 function refreshPanels()
 
-	hotbarMenu():Remove()
-	inventoryMenu():Remove()
-	timer.Simple(2, function()
+	
+	timer.Simple(.05, function()
 	hotbarMenu()
 	inventoryMenu()
 	end)
 
 end
+concommand.Add("refresh_panels", refreshPanels)
 concommand.Add("wl_inv", inventoryMenu)
 concommand.Add("wl_hb", hotbarMenu)

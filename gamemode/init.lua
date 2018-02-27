@@ -22,8 +22,9 @@ models[6] = "models/player/Group03/male_08.mdl"
 	function GM:PlayerInitialSpawn(ply)
 		ply:SetModel(table.Random(models))
 		ply:ConCommand("wl_hb")
+		
 	end
-
+ 
 	function GM:PlayerSpawn( ply )
 	ply:SetWalkSpeed(135)
 	ply:SetWalkSpeed(145)
@@ -33,7 +34,7 @@ models[6] = "models/player/Group03/male_08.mdl"
 	function GM:PlayerAuthed( ply, steamid, uniqueid )
 	
 	ply:databaseCheck()
-	
+	ply:inventoryAttachmentRegister()
 	end
 	
 	function GM:PlayerDisconnected( ply )

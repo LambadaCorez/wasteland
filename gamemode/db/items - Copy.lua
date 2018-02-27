@@ -1,14 +1,12 @@
+
 local items = {}
 
 function getItems( name )
 	if items[name] then
 		return items[name]
 	end
-	return false
+	return false 
 end
-
-
- 
  
 local smgrounds = "models/Items/BoxSRounds.mdl"
 local arrounds = "models/Items/BoxMRounds.mdl"
@@ -16,6 +14,8 @@ local shotgunrounds = "models/Items/BoxBuckshot.mdl"
 local pistolrounds = "models/Items/357ammo.mdl"
 local attachments = "models/Items/car_battery01.mdl"
 
+ 
+local items = {}
  
 items["fillervalue"] = {
 
@@ -29,16 +29,23 @@ items["fillervalue"] = {
 	model = "models/props_junk/PopCan01a.mdl",
 	
 	use = (function(ply, ent)
+		if ply:IsValid() then
+			ply:SetHealth( math.Clamp(ply:Health() + 2, 0, 100 ))
+			if ent then
+				ent:Remove()
+		end
+		end
 		end),
 		spawn = (function(ply, ent)
-			ent:SetItemName("fillervalue")
+			ent:SetItemName("soda")
 			end),
 			skin = 0,
 			buttonDist = 32,
 
 }
 
---FOODS
+
+-- FOOD 
 items["soda1"] = {
 	
 	name = "Blueberry Soda",
@@ -306,9 +313,7 @@ items["boot"] = {
 
 }
 
-
-
---AMMO TYPES
+-- AMMO TYPES
 items["9x18"] = {
 
 	name = "9x18mm Ammo",
@@ -526,378 +531,33 @@ items["454casull"] = {
 			
 }
 
---ATTACHMENTS
+-- ATTACHMENTS
 items["acog"] = {
 
 	name = "ACOG Scope",
 	desc = "ACOG Scope Attachment.",
-	ent = "fas2_att_acog",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-			if ent then
-				ent:Remove()
-				ply:FAS2_PickUpAttachment("acog")
-			end
-		end),
-		spawn = (function(ply, ent)
-			
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["compM4"] = {
-
-	name = "CompM4 Scope",
-	desc = "CompM4 Scope Attachment.",
-	ent = "fas2_att_compm4",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("compm4")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("compm4")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["c79"] = {
-
-	name = "ELCAN C79 Scope",
-	desc = "ELCAN C79 Scope Attachment.",
-	ent = "fas2_att_c79",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("c79")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("c79")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["eotech"] = {
-
-	name = "EOTech 553 Scope",
-	desc = "EOTech 553 Scope Attachment.",
-	ent = "fas2_att_eotech",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("eotech")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("eotech")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["foregrip"] = {
-
-	name = "Foregrip Attachment",
-	desc = "Foregrip Attachment.",
-	ent = "fas2_att_foregrip",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("foregrip")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("foregrip")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["harrisbipod"] = {
-
-	name = "Harris Bipod Attachment",
-	desc = "Harris Bipod Attachment.",
-	ent = "fas2_att_harrisbipod",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("harrisbipod")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("harrisbipod")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["mk4"] = {
-
-	name = "Leupold MK4 Scope Attachment",
-	desc = "Leupold MK4 Scope Attachment.",
-	ent = "fas2_att_leupold",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("leupold")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("leupold")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["m21rnd"] = {
-
-	name = "M21 20rnd Magazine Attachment",
-	desc = "M21 20rnd Magazine Attachment.",
-	ent = "fas2_att_m2120mag",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("m2120mag")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("m21rnd")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["mp5rnd"] = {
-
-	name = "MP5 30rnd Magazine Attachment",
-	desc = "MP5 30rnd Magazine Attachment.",
-	ent = "fas2_att_mp5k30mag",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("mp5k30mag")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("mp5rnd")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["pso1"] = {
-
-	name = "PSO-1 Scope Attachment",
-	desc = "PSO-1 Scope Attachment.",
-	ent = "fas2_att_pso1",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("pso1")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("pso1")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["sg55x"] = {
-
-	name = "SG55X 30rnd Magazine Attachment",
-	desc = "SG55X 30rnd Magazine Attachment.",
-	ent = "fas2_att_sg55x30mag",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("sg55x30mag")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("sg55x")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["sks20rnd"] = {
-
-	name = "SKS 20rnd Magazine Attachment",
-	desc = "SKS 20rnd Magazine Attachment.",
-	ent = "fas2_att_sks20mag",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("sks20mag")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("sks20rnd")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["sks30rnd"] = {
-
-	name = "SKS 30rnd Magazine Attachment",
-	desc = "SKS 30rnd Magazine Attachment.",
-	ent = "fas2_att_sks30mag",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-				ply:FAS2_PickUpAttachment("sks30mag")
-		end),
-		spawn = (function(ply, ent)
-			ent:SetItemName("sks30rnd")
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["suppressor"] = {
-	IDname = "suppressor",
-	name = "Suppressor Barrel Attachment",
-	desc = "Suppressor Barrel Attachment.",
-	ent = "fas2_att_suppressor",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-		end),
-		spawn = (function(ply, ent)
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-items["tritium"] = {
-	IDname = "tritiumsights",
-	name = "Tritium Sight Attachment",
-	desc = "Tritium Sight Attachment.",
-	ent = "fas2_att_tritiumsights",
-	prices = {
-		buy = 135,
-		sell = 75,
-	},
-	model = attachments,
-	equippable = false,
-	attachment = true,
-	use = (function(ply, ent)
-		end),
-		spawn = (function(ply, ent)
-			end),
-			skin = 0,
-			buttonDist = 48,
-			
-}
-
---GUNS
-
-items["glock"] = {
-
-
-	
-	name = "Glock-20",
-	desc = "Top military-grade pistol from the heart of Austria.",
 	ent = "item_basic",
 	prices = {
-		buy = 1200,
-		sell = 750,
+		buy = 135,
+		sell = 75,
 	},
-	model = "models/weapons/w_glock20.mdl",
-	equippable = true,
+	model = attachments,
+	equippable = false,
+	ammo = false,
 	use = (function(ply, ent)
-		if ply:IsValid() then
-			ply:Give("fas2_glock20", true)
 			if ent then
 				ent:Remove()
-		end
-		end
-		end),
-		dequip = (function(ply, ent)
-		if ply:IsValid() then
-			ply:StripWeapon("fas2_glock20")
-			if ent then
-				ent:Remove()
+				ply:FAS2_PickUpAttachment(self.Attachment)
 			end
-		end
 		end),
 		spawn = (function(ply, ent)
-			ent:SetItemName("glock")
+			ent:SetItemName("acog")
 			end),
 			skin = 0,
-			buttonDist = 32,
-		
-
+			buttonDist = 48,
+			
 }
-
---EQUIPABLES
+-- HOTBARRABLE ITEMS
 items["flashlight"] = {
 
 	name = "Flashlight",
@@ -931,5 +591,40 @@ items["flashlight"] = {
 			end),
 			skin = 0,
 			buttonDist = 48,
+
+}
+items["glock"] = {
+	
+	name = "Glock-20",
+	desc = "Top military-grade pistol from the heart of Austria.",
+	ent = "item_basic",
+	prices = {
+		buy = 1200,
+		sell = 750,
+	},
+	model = "models/weapons/w_glock20.mdl",
+	equippable = true,
+	use = (function(ply, ent)
+		if ply:IsValid() then
+			ply:Give("fas2_glock20", true)
+			if ent then
+				ent:Remove()
+		end
+		end
+		end),
+		dequip = (function(ply, ent)
+		if ply:IsValid() then
+			ply:StripWeapon("fas2_glock20")
+			if ent then
+				ent:Remove()
+			end
+		end
+		end),
+		spawn = (function(ply, ent)
+			ent:SetItemName("glock")
+			end),
+			skin = 0,
+			buttonDist = 32,
+		
 
 }
